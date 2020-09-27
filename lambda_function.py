@@ -39,7 +39,26 @@ def build_response(session_attributes, speechlet_response):
 
 
 # --------------- Functions that control the skill's behavior ------------------
-def get_student_question():
+def get_student_question(intent, session):
+    print("SESSION INTENT", session, intent)
+    print("ATTRIBUTES:", session.attributes)
+    session_attributes = {}
+    card_title = "Question"
+    # questions = ["How do you reverse a linked list", "How do I become the tech lead", "What is 2 plus 2"]
+    payload = {'sessionId': "123321"}
+    questions = requests.get('https://doublecheckapp.herokuapp.com/question', params=payload)
+    print("QUESTIONS", questions)
+    # TODO: 'question' should get the one with the most upvotes
+    question = questions[0].questionBody
+    print(question)
+    # question = questions[random.randint(0, len(questions)-1)]
+    speech_output = question
+    reprompt_text = ""
+    should_end_session = True
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_quiz_response():
     session_attributes = {}
     card_title = "Question"
     questions = ["How do you reverse a linked list", "How do I become the tech lead", "What is 2 plus 2"]
@@ -49,9 +68,7 @@ def get_student_question():
     should_end_session = True
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
-
-def get_quiz_response():
-    
+        
 def get_compliment_response():
     """ Have alexa give you a random compliment out of a list of 100. 
         Make sure to add the compliments.txt file to same directory as this one
@@ -121,7 +138,7 @@ def on_intent(intent_request, session):
     if intent_name == "compliment":
         return get_compliment_response()
     elif intent_name == "question":
-        return get_student_question()
+        return get_student_question(intent, session)
     elif intent_name == "quiz":
         return get_quiz_response()
     elif intent_name == "AMAZON.HelpIntent":
@@ -147,7 +164,7 @@ def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
     etc.) The JSON body of the request is provided in the event parameter.
     """
-    print("Incoming request...")
+    print("Incoming request...", event, context)
 
     """
     Uncomment this if statement and populate with your skill's application ID to
