@@ -41,15 +41,16 @@ def build_response(session_attributes, speechlet_response):
 # --------------- Functions that control the skill's behavior ------------------
 def get_student_question(intent, session):
     print("SESSION INTENT", session, intent)
-    print("ATTRIBUTES:", session.attributes)
+    # print("ATTRIBUTES:", session.attributes)
     session_attributes = {}
     card_title = "Question"
     # questions = ["How do you reverse a linked list", "How do I become the tech lead", "What is 2 plus 2"]
     payload = {'sessionId': "123321"}
-    questions = requests.get('https://doublecheckapp.herokuapp.com/question', params=payload)
+    questions = requests.get('https://doublecheckapp.herokuapp.com/question', params=payload).json()
     print("QUESTIONS", questions)
     # TODO: 'question' should get the one with the most upvotes
-    question = questions[0].questionBody
+    question = questions[0]
+    question = question['questionBody']
     print(question)
     # question = questions[random.randint(0, len(questions)-1)]
     speech_output = question
